@@ -1,5 +1,6 @@
-const fileSystem = require('fs')
-// The fist 16 bytes of any fileBasedDb (`.mmr`) file contain the wordSize and the leafLength respectively. For 
+const fileSystem = require('fs');
+const path = require('path')
+// The fist 16 bytes of any fileBasedDb (`.mmr`) file contain the wordSize and the leafLength respectively. For
 // instance 0000 0000 0000 0040 0000 0000 0000 03e8 is a db with wordsize 64 and leafLength 1000.
 
 class FileBasedDB {
@@ -15,6 +16,10 @@ class FileBasedDB {
   static openOrCreate(filePath, fileSystemFlags, wordSize){
     let db = Object.create(this.prototype)
     db.filePath = filePath
+    const dirname = path.dirname(filePath);
+    if (!fileSystem.existsSync(dirname)) {
+      fileSystem.mkdirSync(dirname);
+    }
     db.fd = fileSystem.openSync(filePath, fileSystemFlags)
     if(wordSize){
       db._setWordSize(wordSize)
@@ -47,7 +52,7 @@ class FileBasedDB {
       throw new Error('Can not set nodeValue as an empty buffer')
     }
     return new Promise((resolve, reject)=>{
-      fileSystem.write(this.fd, value, 0, wordSize, ((index + 1) * wordSize), (e, r) => { 
+      fileSystem.write(this.fd, value, 0, wordSize, ((index + 1) * wordSize), (e, r) => {
         if(e){
           reject(e)
         }else{
@@ -74,11 +79,11 @@ class FileBasedDB {
     let lengthBuffer = Buffer.alloc(4)
     lengthBuffer.writeUInt32BE(leafLength, 0)
     return new Promise((resolve, reject)=>{
-      fileSystem.write(this.fd, lengthBuffer, 0, 4, 0, (e, r) => { 
+      fileSystem.write(this.fd, lengthBuffer, 0, 4, 12, (e, r) => {
         if(e){
           reject(e)
         }else{
-          fileSystem.fsync(this.fd, (e, r) => { 
+          fileSystem.fsync(this.fd, (e, r) => {
             if(e){
               reject(e)
             }else{

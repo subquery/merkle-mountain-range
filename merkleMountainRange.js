@@ -43,15 +43,15 @@ class MMR{
 
   async serialize(){
     let numToBuf = (num) => {
-     let str = num.toString(16)
-     return str.length % 2 == 0 ? Buffer.from(str, 'hex') : Buffer.from('0' + str, 'hex')
+      let str = num.toString(16)
+      return str.length % 2 == 0 ? Buffer.from(str, 'hex') : Buffer.from('0' + str, 'hex')
     }
     let bufferedNodes = []
     let nodes = await this.db.getNodes()
     let indexes = Object.keys(nodes)
     for (var i = 0; i < indexes.length; i++) {
       let bufferedKey =
-      bufferedNodes.push([numToBuf(parseInt(indexes[i])), nodes[indexes[i]]])
+          bufferedNodes.push([numToBuf(parseInt(indexes[i])), nodes[indexes[i]]])
     }
     let leafLength = await this.getLeafLength()
     return rlp.encode([leafLength, bufferedNodes])
@@ -341,7 +341,7 @@ class MMR{
     let has = !!nodes[position.i]
     if (!has && position.h > 0){
       if(MMR._hasPosition(nodes, MMR.leftChildPosition(position))
-        && MMR._hasPosition(nodes, MMR.rightChildPosition(position))
+          && MMR._hasPosition(nodes, MMR.rightChildPosition(position))
       ){
         has = true
       }
