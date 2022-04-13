@@ -7,22 +7,22 @@ class FileBasedDB {
   constructor(){
     throw new Error('Please use the static `create` and `open` methods to construct a FileBasedDB')
   }
-  static create(filePath, wordSize = 64){// throws if file already exists
+  static async create(filePath, wordSize = 64){// throws if file already exists
     return this.openOrCreate(filePath, 'ax+', wordSize)
   }
-  static open(filePath){// throws if file does not exist
+  static async open(filePath){// throws if file does not exist
     return this.openOrCreate(filePath, 'r+')
   }
-  static openOrCreate(filePath, fileSystemFlags, wordSize){
+  static async openOrCreate(filePath, fileSystemFlags, wordSize) {
     let db = Object.create(this.prototype)
     db.filePath = filePath
     const dirname = path.dirname(filePath);
     if (!fileSystem.existsSync(dirname)) {
-      fileSystem.mkdirSync(dirname);
+      await fileSystem.promises.mkdir(dirname);
     }
     db.fd = fileSystem.openSync(filePath, fileSystemFlags)
-    if(wordSize){
-      db._setWordSize(wordSize)
+    if (wordSize) {
+      await db._setWordSize(wordSize)
     }
     return db
   }
@@ -105,13 +105,18 @@ class FileBasedDB {
     }
     return nodes
   }
-  _setWordSize(wordSize){
-    if(!wordSize || wordSize < 16){
+  async _setWordSize(wordSize) {
+    if (!wordSize || wordSize < 16) {
       throw new Error('Wordsize of' + wordSize + 'not supported for FileBasedDB')
     }
     let wordSizeBuffer = Buffer.alloc(16)
     wordSizeBuffer.writeUInt32BE(wordSize, 4)
-    fileSystem.writeSync(this.fd, wordSizeBuffer, 0, 16, 0)
+    await fileSystem.write(this.fd, wordSizeBuffer, 0, 16, 0, (e, r)=>{
+      if(e){
+        throw new Error(`Set Wordsize failed \n, ${e}`);
+      }
+    })
+
   }
   async _getWordSize(){
     if (!this._wordSize){
@@ -136,3 +141,4 @@ class FileBasedDB {
 }
 
 module.exports = FileBasedDB
+
