@@ -2,13 +2,14 @@ const fileSystem = require('fs');
 const path = require('path')
 // The fist 16 bytes of any fileBasedDb (`.mmr`) file contain the wordSize and the leafLength respectively. For
 // instance 0000 0000 0000 0040 0000 0000 0000 03e8 is a db with wordsize 64 and leafLength 1000.
+// Now its default length changed to user defined wordsize length
 
 class FileBasedDB {
   constructor(){
     throw new Error('Please use the static `create` and `open` methods to construct a FileBasedDB')
   }
   static create(filePath, wordSize = 64){// throws if file already exists
-    return this.openOrCreate(filePath, 'ax+', wordSize)
+    return this.openOrCreate(filePath, 'w+', wordSize)
   }
   static open(filePath){// throws if file does not exist
     return this.openOrCreate(filePath, 'r+')
@@ -109,9 +110,9 @@ class FileBasedDB {
     if(!wordSize || wordSize < 16){
       throw new Error('Wordsize of' + wordSize + 'not supported for FileBasedDB')
     }
-    let wordSizeBuffer = Buffer.alloc(16)
+    let wordSizeBuffer = Buffer.alloc(wordSize)
     wordSizeBuffer.writeUInt32BE(wordSize, 4)
-    fileSystem.writeSync(this.fd, wordSizeBuffer, 0, 16, 0)
+    fileSystem.writeSync(this.fd, wordSizeBuffer, 0, wordSize, 0)
   }
   async _getWordSize(){
     if (!this._wordSize){
