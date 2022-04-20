@@ -1,7 +1,7 @@
 const { Lock }      = require('semaphore-async-await')
 const rlp           = require('rlp')
 const Position      = require('./position')
-const MemoryBasedDb = require('./db/memoryBasedDb')
+const MemoryBasedDb = require('./memoryBasedDb')
 
 class MMR{
   constructor(hashingFunction, db = new MemoryBasedDb()){
@@ -30,28 +30,28 @@ class MMR{
   //   if(newLeafLength >= leafLength){
   //     await this._setLeafLength(newLeafLength)
   //   }
-  //   // new plan: 
+  //   // new plan:
   //   // extendLength(proof)
   //   // make sure the new leafLength is greater than this's
   //   // create a temp mem proofMmr from serializedDb
   //   // then get this mmr's peaks, add them to proofs db nodes (*overwriting* any duplicates)
   //   // then call a `get()` on each peak position (but this is a different get because we only have
   //   // the nodeIndex (not the leaf index))
-  //   // if get(nodeIndex) passes verification, add all proof nodes to this mmr (but dont 
-  //   // overwrite). You have now verified *all* previously verified leaves are in the new one. 
+  //   // if get(nodeIndex) passes verification, add all proof nodes to this mmr (but dont
+  //   // overwrite). You have now verified *all* previously verified leaves are in the new one.
   // }
 
   async serialize(){
     let numToBuf = (num) => {
-     let str = num.toString(16)
-     return str.length % 2 == 0 ? Buffer.from(str, 'hex') : Buffer.from('0' + str, 'hex')
+      let str = num.toString(16)
+      return str.length % 2 == 0 ? Buffer.from(str, 'hex') : Buffer.from('0' + str, 'hex')
     }
     let bufferedNodes = []
     let nodes = await this.db.getNodes()
     let indexes = Object.keys(nodes)
     for (var i = 0; i < indexes.length; i++) {
-      let bufferedKey = 
-      bufferedNodes.push([numToBuf(parseInt(indexes[i])), nodes[indexes[i]]])
+      let bufferedKey =
+          bufferedNodes.push([numToBuf(parseInt(indexes[i])), nodes[indexes[i]]])
     }
     let leafLength = await this.getLeafLength()
     return rlp.encode([leafLength, bufferedNodes])
@@ -135,7 +135,7 @@ class MMR{
       this.lock.release()
     }
     // note: a single peak differs from its MMR root in that it gets hashed a second time
-    return this.digest(...peakValues) 
+    return this.digest(...peakValues)
   }
   async getNodeLength(){ return  MMR.getNodePosition(await this.getLeafLength()).i }
   async getLeafLength(){ // caching
@@ -341,7 +341,7 @@ class MMR{
     let has = !!nodes[position.i]
     if (!has && position.h > 0){
       if(MMR._hasPosition(nodes, MMR.leftChildPosition(position))
-        && MMR._hasPosition(nodes, MMR.rightChildPosition(position))
+          && MMR._hasPosition(nodes, MMR.rightChildPosition(position))
       ){
         has = true
       }

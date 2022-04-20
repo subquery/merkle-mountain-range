@@ -1,17 +1,17 @@
 const assert = require('assert')
-const fileSystem = require('fs') 
+const fileSystem = require('fs')
 assert.rejects = async (promiseThatShouldReject) => {
   await promiseThatShouldReject.then(
-    () => { throw new Error('Expected method to reject.') },
-    (error) => { assert.strictEqual(!!error, true) }
+      () => { throw new Error('Expected method to reject.') },
+      (error) => { assert.strictEqual(!!error, true) }
   )
 }
-const MMR = require('./../src/merkleMountainRange')
-const Position = require('./../src/position')
-const MemoryBasedDb = require('./../src/db/memoryBasedDb')
-const FileBasedDb = require('./../src/db/fileBasedDb')
-const LevelDbBasedDb = require('./../src/db/levelDbBasedDb')
-const { keccak256FlyHash }   = require('../src/digests')
+const MMR = require('../merkleMountainRange')
+const Position = require('../position')
+const MemoryBasedDb = require('../memoryBasedDb')
+const FileBasedDb = require('../fileBasedDb')
+const LevelDbBasedDb = require('../levelDbBasedDb')
+const { keccak256FlyHash }   = require('../digests')
 
 describe('MerkleMountinRange (MMR) instance/async functions', () => {
   let fileBasedMmr, levelDbBasedMmr, mmr, proofMmr
@@ -54,7 +54,7 @@ describe('MerkleMountinRange (MMR) instance/async functions', () => {
         await mmr.get(i)
       }
       console.log("      Seconds for 1 memoryBased get ( ~1000 leaves)       ", ((Date.now() - b) / 1000) / NUM_LOOPS)
-      
+
       b = Date.now()
       for (var i = 0; i < NUM_LOOPS; i++) {
         await tempMmr.append(etcLeafData[i], i)
@@ -129,7 +129,7 @@ describe('MerkleMountinRange (MMR) instance/async functions', () => {
   })
 
   context('#get', () => {
-    it('a few targeted `get`s 0, 1, 3, 8 ...999', async () => { 
+    it('a few targeted `get`s 0, 1, 3, 8 ...999', async () => {
       assert.strictEqual( etcLeafData[0].equals(await mmr.get(0)), true)
       assert.strictEqual( etcLeafData[1].equals(await mmr.get(1)), true)
       assert.strictEqual( etcLeafData[3].equals(await mmr.get(3)), true)
@@ -245,10 +245,10 @@ describe('MerkleMountinRange (MMR) instance/async functions', () => {
 
   context('#getProof', () => {
     it('should build and return a proof tree', async () => {
-      proofMmr = await mmr.getProof([18]) 
+      proofMmr = await mmr.getProof([18])
       // console.log(proofMmr)
       assert.deepEqual(Object.keys(proofMmr.db.nodes), [30, 33, 34, 35, 44, 60, 65])
-      
+
       await proofMmr.get(18) // should not reject
       await proofMmr.get(19) // the sibling leaf is also contained in the proof
       await assert.rejects(proofMmr.get(17)) // insufficient to prove any other leaves
@@ -264,7 +264,7 @@ describe('MerkleMountinRange (MMR) instance/async functions', () => {
 
   context('#serialize, #fromSerialized', () => {
     it('should build and return a proof tree', async () => {
-      proofMmr = await mmr.getProof([18]) 
+      proofMmr = await mmr.getProof([18])
       let serialied = await proofMmr.serialize()
       let dbFromSerialized = MemoryBasedDb.fromSerialized(serialied)
       let mmrFromSerialized = MMR.fromSerialized(proofMmr.digest, serialied)
@@ -292,7 +292,7 @@ describe('MerkleMountinRange (MMR) instance/async functions', () => {
   })
 })
 
-  // getRoot getNodeLength getLeafLength delete getProof _getNodeValue _hasNode _verifyPath _setLeafLength _hashUp
+// getRoot getNodeLength getLeafLength delete getProof _getNodeValue _hasNode _verifyPath _setLeafLength _hashUp
 
 
 
