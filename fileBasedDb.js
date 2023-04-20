@@ -97,12 +97,12 @@ class FileBasedDB {
   }
   async getNodes(){
     let wordSize = await this._getWordSize()
-    let stats = fs.statSync(this.filePath)
+    let stats = fileSystem.statSync(this.filePath)
     let nodeLength = (stats.size - wordSize) / wordSize
 
     let nodes = {}
     for (var i = 0; i < nodeLength; i++) {
-      node[i] = await this.get(i)
+      nodes[i] = await this.get(i)
     }
     return nodes
   }
