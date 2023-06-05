@@ -51,6 +51,10 @@ class MemoryBasedDb {
     return this.nodes
   }
 
+  async delete(key){
+    // This is not implemented, not impact on current delete feature.
+  }
+
   // async serialize(){
   //   let numToBuf = (num) => {
   //    let str = num.toString(16)
@@ -59,7 +63,7 @@ class MemoryBasedDb {
   //   let bufferedNodes = []
   //   let indexes = Object.keys(this.nodes)
   //   for (var i = 0; i < indexes.length; i++) {
-  //     let bufferedKey = 
+  //     let bufferedKey =
   //     bufferedNodes.push([numToBuf(parseInt(indexes[i])), this.nodes[indexes[i]]])
   //   }
   //   return rlp.encode([this.leafLength, bufferedNodes])
