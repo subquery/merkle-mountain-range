@@ -150,8 +150,6 @@ class MMR{
       let leafLength = await this.getLeafLength()
       if(leafIndex < leafLength){
         await this._setLeafLength(leafIndex)
-        const leafPosition = MMR.getNodePosition(leafIndex)
-        await this.db.delete(Number(leafPosition.i))
       }
     }finally{
       this.lock.release()

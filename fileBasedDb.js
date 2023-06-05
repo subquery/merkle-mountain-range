@@ -76,10 +76,6 @@ class FileBasedDB {
     })
   }
 
-  async delete(key){
-    // This is not implemented, not impact on current delete feature.
-  }
-
   async setLeafLength(leafLength){ // to do: deallocate the deleted part of the file
     let lengthBuffer = Buffer.alloc(4)
     lengthBuffer.writeUInt32BE(leafLength, 0)
